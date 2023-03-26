@@ -48,6 +48,25 @@ LOOP_DECLARATION = "ENQUANTO BATALHA", ":", ["ESTRATEGIA", FUNCTION_NAME, "."]
 ## Exemplo de código
 
 ```
+#processo de definição da equipe
+TIME minha_equipe TEM POKEMON Pikachu, POKEMON Togekiss, POKEMON Gallade, POKEMON Glaceon, POKEMON Lapras, POKEMON Mimikyu.
+
+#processo de definição dos atributos dos pokemons escolhidos
+HP pikachu_hp TEM 120.
+ATAQUE pikachu_attack TEM 80.
+HABILIDADE pikachu_special TEM ThunderBolt.
+TIPO pikachu_type TEM ELETRIC.
+. 
+. 
+. 
+HP mimikyu_hp TEM 90.
+ATAQUE mimikyu_attack TEM 130.
+HABILIDADE mimikyu_special TEM WoodHammer.
+TIPO mimikyu_type TEM GHOST.
+
+ITENS mochila: 2x potion, 3x revive, 1x max_potion.
+
+#precisa tambem definir a equipe dos oponentes
 OPONENTE Garchomp, Lucario, Milotic, Roserade, Spiritomb.
 
 HP garchomp_hp TEM 200.
