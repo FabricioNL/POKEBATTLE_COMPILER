@@ -1,5 +1,5 @@
 #processo de definição da equipe
-TIME minha_equipe TEM POKEMON Pikachu, POKEMON Togekiss, POKEMON Gallade, POKEMON Glaceon, POKEMON Lapras, POKEMON Mimikyu.
+TIME POKEMON Pikachu POKEMON Togekiss POKEMON Gallade POKEMON Glaceon POKEMON Lapras POKEMON Mimikyu.
 
 #processo de definição dos atributos dos pokemons escolhidos
 HP pikachu_hp TEM 120.
@@ -14,7 +14,7 @@ ATAQUE mimikyu_attack TEM 130.
 HABILIDADE mimikyu_special TEM WoodHammer.
 TIPO mimikyu_type TEM GHOST.
 
-ITENS mochila: 2x potion, 3x revive, 1x max_potion.
+ITENS mochila: 2 potion 3 revive 1 max_potion.
 
 #precisa tambem definir a equipe dos oponentes
 OPONENTE Garchomp, Lucario, Milotic, Roserade, Spiritomb.
@@ -58,8 +58,6 @@ GOLPE WoodHammer:
 
 ENQUANTO BATALHA:
     ESTRATEGIA BASE.
-    TURNO OPONENTE.
-    TURNO JOGADOR.
     
 
 

@@ -9,10 +9,9 @@ TIPO = ( NORMAL | FOGO | AGUA | ELETRICO | GRAMA | GELO | LUTADOR | VENENO |
         TERRA | VOADOR | PSIQUICO | INSETO | PEDRA | FANTASMA | DRAGAO | AÇO | 
         FADA | SOMBRIO )
 
-POKEMON_OPTIONS = ("Dragonite" | "Eevee" | "Garchomp" | "Glaceon" | "Empoleon" | "Togekiss" | 
-        "Charizard" | "Ho-oh" | "Pikachu" | "Entei" | "Suicune" | "Blastoise" | "Mimikyu" |
-        "Lucario" | "Corsola" | "Emolga" | "Serviper" | "Torterra" | "Altaria" | "Absol" | "Palkia" |
-        "Darkari", "Gallade", "Lapras", "Milotic", "Spiritomb", "Roserade")
+POKEMON_OPTIONS = (Dragonite|Eevee|Garchomp|Glaceon|Empoleon|Togekiss| 
+        Charizard|Ho-oh|Pikachu|Entei|Suicune|Blastoise|Mimikyu|
+        Lucario|Corsola|Emolga|Serviper|Torterra|Altaria|Absol|Palkia|Gallade|Lapras|Milotic|Spiritomb|Roserade)
 
 STRING = LETTER {LETTER}
 NUMBER = DIGIT {DIGIT}
@@ -20,9 +19,9 @@ NUMBER = DIGIT {DIGIT}
 VALUE = STRING | NUMBER 
 IDENTIFIER = (LETTER)
 
-BOOL_OPERATIONS = ("IGUAL" | "MAIOR" | "MENOR"| "E"| "OU")
+BOOL_OPERATIONS = (IGUAL|MAIOR|MENOR|E|OU)
 
-ATRIBUTE = ("HP", "ATAQUE", "POKEMON", "ITENS", "HABILIDADE", "TIME", "OPONENTE")
+ATRIBUTE = (HP|ATAQUE|POKEMON|ITENS|HABILIDADE|TIME|OPONENTE)
 
 ASSIGNMENT = ATRIBUTE, STRING, "TEM", NUMBER | STRING, "."
 
