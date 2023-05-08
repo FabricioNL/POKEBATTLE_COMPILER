@@ -1,6 +1,9 @@
 from rply import LexerGenerator
 from rply import ParserGenerator
 from rply.token import Token
+from rply.errors import ParsingError
+
+
 
 lg = LexerGenerator()
 
@@ -9,12 +12,14 @@ lg.ignore(r'\s+')
 lg.add('TIPO', r'(NORMAL|FOGO|AGUA|ELETRICO|GRAMA|GELO|LUTADOR|VENENO|TERRA|VOADOR|PSIQUICO|INSETO|PEDRA|FANTASMA|DRAGAO|AÇO|FADA|SOMBRIO)')
 lg.add('POKEMON', r'(Dragonite|Eevee|Garchomp|Glaceon|Empoleon|Togekiss|Charizard|Ho-oh|Pikachu|Entei|Suicune|Blastoise|Mimikyu|Lucario|Corsola|Emolga|Serviper|Torterra|Altaria|Absol|Palkia|Gallade|Lapras|Milotic|Spiritomb|Roserade)')
 lg.add('ITEM', r'(Revive|Potion|Super_Potion|Hyper_Potion)')
+lg.add('IF', r'SE')
 lg.add('BOOL_OP', r'(IGUAL|MAIOR|MENOR|E|OU)')
 lg.add("ASSIGN", r'TEM')
+lg.add("ACTION", r'(ESCOLHER|USAR)')
 lg.add("EQUIPE", r'(TIME|OPONENTE)')
 lg.add("ATRIBUTE", r'(HP|ATAQUE|POKEMON|ITENS|HABILIDADE)')
 lg.add("END_STATMENT", r'\.')
-
+lg.add("QUEBRA", r'\\n')
 lg.add("WHILE", r'ENQUANTO BATALHA')
 lg.add("END_FUNCTION", r'\:')
 lg.add("FUNC_DEC", r'(GOLPE|ESTRATEGIA)')
@@ -67,13 +72,46 @@ def loop_item(p):
 def empty_loop_item(p):
     return []
 
+#PRECISA QUE TENHA VARIAS CONDIÇÕES DE IF COMBINADAS
+@pg.production('if_statement : IF VAR_NAME BOOL_OP NUMBER ACTION ITEM END_STATMENT')
+def if_statement(p):
+    print("if_statement: "  + str(p))
+    
+@pg.production('loop_if_statement : if_statement loop_if_statement')
+def loop_if_statement(p):
+    print("loop_if_statement: "  + str(p))
+    
+@pg.production('loop_if_statement :')
+def empty_loop_if_statement(p):
+    return []
+
+@pg.production('func_declaration : FUNC_DEC VAR_NAME END_FUNCTION QUEBRA loop_if_statement')
+def func_declaration(p):
+    print("func_declaration: "  + str(p))
+    
+@pg.production('loop_func_declaration : func_declaration loop_func_declaration')
+def loop_func_declaration(p):
+    print("loop_func_declaration: "  + str(p))
+
+@pg.production('loop_func_declaration :')
+def empty_loop_func_declaration(p):
+    return []
+
+
+@pg.production('begin_battle : WHILE  END_FUNCTION QUEBRA loop_function_call')
+def begin_battle(p):
+    print("begin_battle: "  + str(p))
+
+@pg.error
+def error_handler(token):
+    raise ValueError("Ran into a %s where it wasn't expected" % token.gettokentype())
 
 parser = pg.build()
 
 #ast = parser.parse(lexer.lex('TIME POKEMON Glaceon POKEMON Togekiss.'))
-ast = parser.parse(lexer.lex('TIME POKEMON Glaceon POKEMON Togekiss.'))
+ast = parser.parse(lexer.lex('HP pikachu_hp TEM 120.'))
 
 
-for token in lexer.lex('HP pikachu_hp TEM 120.'):
-    pass
-    print(token)
+#for token in lexer.lex('HP pikachu_hp TEM 120.'):
+#    pass
+#    print(token)

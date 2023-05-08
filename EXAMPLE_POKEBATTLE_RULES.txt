@@ -33,17 +33,17 @@ TIPO garchomp_type TEM DRAGON.
 
 #definindo todos os setups de trocas do jogo. Funciona como definir funções.
 
-ESTRATEGIA BASE:
-    SE TIPO OPONENTE IGUAL DRAGAO, ESCOLHER Glaceon. 
-    SE TIPO OPONENTE IGUAL LUTADOR, ESCOLHER Togekiss.
-    SE TIPO OPONENTE IGUAL AGUA, ESCOLHER Mimikyu.
+ESTRATEGIA base:
+    SE TIPO OPONENTE IGUAL DRAGAO ESCOLHER Glaceon. 
+    SE TIPO OPONENTE IGUAL LUTADOR ESCOLHER Togekiss.
+    SE TIPO OPONENTE IGUAL AGUA ESCOLHER Mimikyu.
 
-    SE glaceon_hp IGUAL 0, USAR revive.
-    SE lapras_hp IGUAL 0, USAR revive.
-    SE mimikyu_hp IGUAL 0, USAR revive.
+    SE glaceon_hp IGUAL 0 USAR revive.
+    SE lapras_hp IGUAL 0 USAR revive.
+    SE mimikyu_hp IGUAL 0 USAR revive.
 
-    SE glaceon_hp MAIOR 0 E MENOR 50, USAR potion.
-    SE gallade_hp MAIOR 0 E MENOR 120, USAR max_potion.
+    SE glaceon_hp MAIOR 0 E MENOR 50 USAR potion.
+    SE gallade_hp MAIOR 0 E MENOR 120 USAR max_potion.
 
 #voce tambem pode criar funcoes de ataque. Caso nao crie, o ataque tera o ataque base 
 
@@ -57,7 +57,7 @@ GOLPE WoodHammer:
    
 
 ENQUANTO BATALHA:
-    ESTRATEGIA BASE.
+    ESTRATEGIA base.
     
 
 
