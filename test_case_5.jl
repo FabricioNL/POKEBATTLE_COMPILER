@@ -9,8 +9,8 @@ mimikyu_tipo::TIPO IGUAL "FANTASMA"
 max_potion::ITEM IGUAL 50
 super_potion::ITEM IGUAL 30
 
-println(mimikyu_hp)
-println(pikachu_hp)
+#println(mimikyu_hp)
+#println(pikachu_hp)
 
 mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
 pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
@@ -24,8 +24,8 @@ ESTRATEGIA estrategia_base(pokemon_hp::HP, item_name::ITEM)::HP
 FIM_TATICA
 
 ENQUANTO mimikyu_hp MAIOR 0
-    println(mimikyu_hp)
-    println(pikachu_hp)
+    #println(mimikyu_hp)
+    #println(pikachu_hp)
     pikachu_hp IGUAL estrategia_base(pikachu_hp, max_potion)
     mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
     pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp

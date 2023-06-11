@@ -1,12 +1,13 @@
 import sys 
 import re 
 
+turno = 0
+
 LIST_TERM = ['*','/', '&&']
 LIST_EXP = ['+','-','||', "."]
 LIST_PAREN = ['(',')']
 LIST_ASSIGN = ['=']
 LIST_REL = ['<','>','==']
-
 
 LIST_RESERVED_WORDS = ['println', 'if', 'else', 'while', 'for', 'int', 'float', 'char', 'string', 
                        'bool', 'true', 'false', 'return', 'break', 'continue', 'and', 'or', 'not']
@@ -30,17 +31,28 @@ class BinOp(Node):
     def evaluate(self, symboltable):
         direita = self.children[0].evaluate(symboltable)
         
-        #teste
-        #direita = direita[1].evaluate(symboltable)
-        
         esquerda = self.children[1].evaluate(symboltable)
         
         if self.value == "+":
             if direita[0] == "Int" and esquerda[0] == "Int":
+                
+                item = self.children[0].value
+                receiver = self.children[1].value.split("_")[0]
+                print("trainer utilizou " + item)
+                print(receiver + " recuperou " + str(direita[1]) + " de HP")
                 return ["Int", direita[1] + esquerda[1]]
+        
         if self.value == "-":
             if direita[0] == "Int" and esquerda[0] == "Int":
+                #printa que o receiver perdeu x de vida
+                attacker = self.children[0].value.split("_")[0]
+                receiver = self.children[1].value.split("_")[0]
+                print(attacker + " atacou " + receiver)
+                print(receiver + " perdeu " + str(direita[1]) + " de HP")        
+                if (esquerda[1] - direita[1]) < 0:
+                    return ["Int", 0]
                 return ["Int", esquerda[1] - direita[1]]
+        
         if self.value == "*":
             if direita[0] == "Int" and esquerda[0] == "Int":
                 return ["Int", direita[1] * esquerda[1]]
@@ -60,24 +72,6 @@ class BinOp(Node):
             if direita[1] > esquerda[1]:
                 return ["Int", 1]
             return ["Int", 0]
-                #return ["Int", direita[1] > esquerda[1]]
-        #if self.value == "&&":
-        #    if direita[0] == "Int" and esquerda[0] == "Int":
-        #        if direita[1] and esquerda[1]:
-        #            return ["Int", 1]
-        #        return ["Int", 0]
-        #        #return ["Int", direita[1] and esquerda[1]]
-        #if self.value == "||":
-        #    if direita[0] == "Int" and esquerda[0] == "Int":
-        #        if direita[1] or esquerda[1]:
-        #            return ["Int", 1]
-        #        return ["Int", 0]
-        #        #return ["Int", direita[1] or esquerda[1]]
-        #if self.value == ".":
-        #        return ["String", str(direita[1]) + str(esquerda[1])]
-        #if self.value == "/":
-        #    if direita[0] == "Int" and esquerda[0] == "Int":
-        #        return ["Int", direita[1] // esquerda[1]]
 
 class UnOp(Node):
     
@@ -133,7 +127,6 @@ class Identifier(Node):
     def evaluate(self, symboltable):
         return symboltable.getter(self.value)
     
-
 class FuncTable:
      
     table = {}
@@ -204,7 +197,8 @@ class SymbolTable:
             sys.stderr.write('ERROR: KEY ALREADY EXISTS')
             sys.exit(1)
             
-        self.table[key] = value        
+        self.table[key] = value 
+               
         
         
 class Assignment(Node):
@@ -215,8 +209,8 @@ class Assignment(Node):
         self.children = children
     
     def evaluate(self, symboltable):
-        symboltable.setter(self.value, self.children[0].evaluate(symboltable))
-        
+        result = self.children[0].evaluate(symboltable)
+        symboltable.setter(self.value, result)
 
 class VarDec(Node):
     
@@ -232,7 +226,8 @@ class VarDec(Node):
                 symboltable.create(self.children[0], [self.value, ""]) 
         elif len(self.children) == 2:
             if self.value == "Int" and self.children[1].evaluate(symboltable)[0] == "Int":
-                symboltable.create(self.children[0], [self.value, self.children[1].evaluate(symboltable)[1]])
+                value = self.children[1].evaluate(symboltable)[1]
+                symboltable.create(self.children[0], [self.value, value])           
             if self.value == "String" and self.children[1].evaluate(symboltable)[0] == "String":
                 symboltable.create(self.children[0], [self.value, self.children[1].evaluate(symboltable)[1]])
                 
@@ -297,7 +292,7 @@ class While(Node):
         self.children = children
     
     def evaluate(self, symboltable):
-        #print(self.children[0].evaluate(symboltable))
+        print("pokebattle iniciada!")
         while self.children[0].evaluate(symboltable)[1]:
             self.children[1].evaluate(symboltable)
             
@@ -362,16 +357,6 @@ class Tokenizer:
             self.next =  Token("OPERATOR", "*")
             self.position = self.position + 1
             return
-            
-        #elif self.source[self.position] == '+': # se for soma
-        #    self.next =  Token("OPERATOR", "+")
-        #    self.position = self.position + 1
-        #    return
-            
-        #elif self.source[self.position] == '-': # se for sub
-        #    self.next = Token("OPERATOR", "-")
-        #    self.position = self.position + 1
-        #    return
         
         elif self.source[self.position] == ',':
             self.next = Token("AND_ARG", ",")
@@ -625,17 +610,6 @@ class Parse:
                 noDois = Parse.parseFactor(tokenizer)
                 noUm = BinOp("*", [noUm, noDois])    
                 
-            elif tokenizer.next.value == '/':
-                tokenizer.selectNext()
-                noDois = Parse.parseFactor(tokenizer)
-                noUm = BinOp("/", [noUm, noDois])
-                
-            elif tokenizer.next.value == '&&':
-                tokenizer.selectNext()
-                noDois = Parse.parseFactor(tokenizer)
-                noUm = BinOp("&&", [noUm, noDois])
-                
-        
         return noUm
         
     @staticmethod
@@ -672,22 +646,12 @@ class Parse:
             if tokenizer.next.value == '+':
                 tokenizer.selectNext()
                 noDois = Parse.parseTerm(tokenizer)
-                noUm = BinOp("+", [noUm, noDois])
-                
-            if tokenizer.next.value == ".":
-                tokenizer.selectNext()
-                noDois = Parse.parseTerm(tokenizer)
-                noUm = BinOp(".", [noUm, noDois])
+                noUm = BinOp("+", [noUm, noDois])               
                 
             elif tokenizer.next.value == '-':
                 tokenizer.selectNext()
                 noDois = Parse.parseTerm(tokenizer)
                 noUm = BinOp("-", [noUm, noDois])
-                
-            elif tokenizer.next.value == '||':
-                tokenizer.selectNext()
-                noDois = Parse.parseTerm(tokenizer)
-                noUm = BinOp("||", [noUm, noDois])
                 
         return noUm
     
@@ -1012,7 +976,7 @@ def read_file(file):
     with open(file, 'r') as f:
         return f.read()
 
-string = 'test_case_5.jl'
+string = 'test_case_2.jl'
 #string = sys.argv[1]
 test_files = read_file(string)
 sb = SymbolTable()

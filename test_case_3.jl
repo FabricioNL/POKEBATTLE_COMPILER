@@ -11,15 +11,6 @@ super_potion::ITEM IGUAL 30
 
 mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
 pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
-println(mimikyu_hp)
-println(pikachu_hp)
 
 pikachu_hp IGUAL max_potion RECUPERAR pikachu_hp
-
-println(pikachu_hp)
-println(pikachu_tipo)
-
-SE pikachu_hp MENOR 20
-    println("POKEMON") 
-FIM_TATICA
 
