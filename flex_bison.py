@@ -7,20 +7,24 @@ lg = LexerGenerator()
 
 lg.add('NUMBER', r'\d+')
 lg.ignore(r'\s+')
-lg.add('TIPO', r'(NORMAL|FOGO|AGUA|ELETRICO|GRAMA|GELO|LUTADOR|VENENO|TERRA|VOADOR|PSIQUICO|INSETO|PEDRA|FANTASMA|DRAGAO|AÇO|FADA|SOMBRIO)')
-lg.add('ITEM', r'ITEM')
 lg.add('IF', r'SE')
-lg.add('BOOL_OP', r'(MAIOR|MENOR)')
+lg.add('BOOL_OP', r'(MAIOR|MENOR|EXATO)')
 lg.add("ASSIGN", r'IGUAL')
-lg.add("ACTION", r'(USAR)')
-lg.add("ATRIBUTE", r'(HP|ATAQUE|POKEMON|ITENS|HABILIDADE)')
-lg.add("END_STATMENT", r'\.')
+lg.add("ATRIBUTE_INT", r'(HP|ATAQUE)')
+lg.add("ATRIBUTE_STR", r'(TIPO)')
 lg.add("QUEBRA", r'\\n')
-lg.add("WHILE", r'ENQUANTO')
-lg.add("END_FUNCTION", r'\:')
+lg.add("VIRGULA", r',')
+lg.add("BINOP" , r'(RECUPERAR|ATACAR|\*)')
+lg.add("END", r'FIM_TATICA')
+lg.add("WHILE", r'BATALHA')
+lg.add("RETURN", r'RESULTADO')
+lg.add("ASPAS", r'\"')
+lg.add("OPEN_PAREN", r'\(')
+lg.add("CLOSE_PAREN", r'\)')
+lg.add("DOUBLE_ARROW", r'>>')
+lg.add("SEMI_ARROW", r'=>')
 lg.add("FUNC_DEC", r'(ESTRATEGIA)')
 lg.add('VAR_NAME', r'[a-zA-Z_]+')
-
 
 lexer = lg.build()
 
@@ -34,26 +38,26 @@ class Node:
 
 pg = ParserGenerator(
     # Uma lista de nomes de todos os tokens, aceitos pelo parser
-    ['TIPO', 'POKEMON', 'ITEM', 'BOOL_OP', 'ASSIGN', 'EQUIPE', 'ATRIBUTE', 'END_STATMENT', 'WHILE', 'END_FUNCTION', 'VAR_DEC', 'VAR_NAME', 'STRING', 'NUMBER'],
+    ['NUMBER', 'IF', 'BOOL_OP', 'ASSIGN', 'ATRIBUTE_INT', 'ATRIBUTE_STR', 'QUEBRA', 'VIRGULA', 'BINOP', 'END', 'WHILE', 'RETURN', 'ASPAS', 'OPEN_PAREN', 'CLOSE_PAREN', 'DOUBLE_ARROW', 'SEMI_ARROW', 'FUNC_DEC', 'VAR_NAME'],
 )
 
-@pg.production('main : pokemon_atributes_declaration main')
-@pg.production('main : item_declaration main')
+#@pg.production('main : pokemon_atributes_declaration main')
+#@pg.production('main : item_declaration main')
 #@pg.production('main : item_definition main')
 
-@pg.production('main : ')
-def main(p):
-    pass    
-
-#loop declaração equipe    
-@pg.production('pokemon_atributes_declaration : ATRIBUTE VAR_NAME ASSIGN NUMBER END_STATMENT')
-def time_pokemons(p):
-    print("var declaration: "  + str(p))
-    
-
-@pg.production('item_declaration : ITEM VAR_NAME ASSIGN NUMBER END_STATMENT')
-def loop_item(p):
-    print("item declaration: "  + str(p))
+#@pg.production('main : ')
+#def main(p):
+#    pass    
+#
+##loop declaração equipe    
+#@pg.production('pokemon_atributes_declaration : ATRIBUTE VAR_NAME ASSIGN NUMBER END_STATMENT')
+#def time_pokemons(p):
+#    print("var declaration: "  + str(p))
+#    
+#
+#@pg.production('item_declaration : ITEM VAR_NAME ASSIGN NUMBER END_STATMENT')
+#def loop_item(p):
+#    print("item declaration: "  + str(p))
 
 #loop definição de variaveis
 #@pg.production('pokemon_definition : ATRIBUTE VAR_NAME ASSIGN NUMBER END_STATMENT')
@@ -103,7 +107,7 @@ def loop_item(p):
 #def error_handler(token):
 #    raise ValueError("Ran into a %s where it wasn't expected" % token.gettokentype())
 
-parser = pg.build()
+#parser = pg.build()
 
 #EXEMPLOS DE ENTRADA
 
@@ -112,6 +116,34 @@ parser = pg.build()
 
 
 #PARA DEBUG
-for token in lexer.lex('ITEM max_potion IGUAL 20.'):
-    #pass
+for token in lexer.lex(
+"""pikachu_hp>>HP IGUAL 80
+pikachu_attack>>ATAQUE IGUAL 18
+pikachu_tipo>>TIPO IGUAL "ELETRICO"
+
+mimikyu_hp>>HP IGUAL 60
+mimikyu_attack>>ATAQUE IGUAL 30
+mimikyu_tipo>>TIPO IGUAL "FANTASMA"
+
+max_potion>>ITEM IGUAL 50
+super_potion>>ITEM IGUAL 30
+
+mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
+pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
+
+ESTRATEGIA estrategia_base(pokemon_hp=>HP, item_name=>ITEM) HP
+    SE pokemon_hp MENOR 30
+        pokemon_hp IGUAL item_name RECUPERAR pokemon_hp 
+    FIM_TATICA
+
+    RESULTADO pokemon_hp
+FIM_TATICA
+
+BATALHA mimikyu_hp MAIOR 0
+    pikachu_hp IGUAL estrategia_base(pikachu_hp, max_potion)
+    mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
+    pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
+FIM_TATICA
+"""):
+    
     print(token)
