@@ -72,28 +72,6 @@ class BinOp(Node):
                 return ["Int", 1]
             return ["Int", 0]
 
-class UnOp(Node):
-    
-    def  __init__(self, value, children):
-        self.value = value
-        self.children = children
-    
-    def evaluate(self, symboltable):
-        
-        no = self.children[0].evaluate(symboltable)
-        
-        if no[0] == "Int":
-            if self.value == "!":
-                var =  not no[1]
-                return ["Int", var]
-            if self.value == "+":
-                return ["Int", no[1]]
-            return ["Int", -1*no[1]]
-    
-        #QUEBRA AQUI =)
-        sys.stderr.write('ERROR: TRIED UNOP WITH A STRING')
-        sys.exit(1)
-
 class IntVal(Node):
     
     def __init__(self, value):
@@ -323,6 +301,15 @@ class Block(Node):
             if type(child) == Return:
                 return child.evaluate(symboltable)    
             child.evaluate(symboltable)
+        
+        #percorre a simymboltableboltable e printa os valores
+        for key in symboltable.table:
+            list_values = symboltable.table[key]
+            if list_values[0] == "HP" and list_values[1] <= 0:
+                name = key.split("_")[0]
+                print(name + " desmaiou!")
+                
+        
 
 class While(Node):
     
@@ -415,19 +402,23 @@ class Tokenizer:
             if self.position + 1 < len(self.source) and self.source[self.position + 1] == '=':
                 self.next = Token("OPERATOR", "==")
                 self.position = self.position + 2
+                
+            if self.position + 1 < len(self.source) and self.source[self.position + 1] == '>':
+                self.next = Token("OPERATOR", "=>")
+                self.position = self.position + 2
             else:
                 self.next = Token("OPERATOR", "=")
                 self.position = self.position + 1
             
             return
         
-        elif self.source[self.position] == ':':
-            if self.position + 1 < len(self.source) and self.source[self.position + 1] == ':':
-                self.next = Token("OPERATOR", "::")
+        elif self.source[self.position] == '>':
+            if self.position + 1 < len(self.source) and self.source[self.position + 1] == '>':
+                self.next = Token("OPERATOR", ">>")
                 self.position = self.position + 2
                 return
             else:
-                self.next = Token("OPERATOR", ":")
+                self.next = Token("OPERATOR", ">")
                 self.position = self.position + 1
             
             return
@@ -459,7 +450,7 @@ class Tokenizer:
                 value = value + self.source[self.position]
                 self.position = self.position + 1
 
-            if value == "ENQUANTO": 
+            if value == "BATALHA": 
                 self.next = Token("WHILE", value)  
                 return 
             
@@ -588,26 +579,6 @@ class Parse:
             tokenizer.selectNext()
             stringVal = StringVal(name)
             return stringVal
-                
-        if tokenizer.next.type == 'OPERATOR' and tokenizer.next.value == '+':
-            tokenizer.selectNext()
-            resultado = Parse.parseFactor(tokenizer)
-            unop = UnOp("+", [resultado])
-            return unop
-        
-        if tokenizer.next.type == 'OPERATOR' and tokenizer.next.value == '-':
-            tokenizer.selectNext()
-            resultado = Parse.parseFactor(tokenizer)
-            unop = UnOp("-", [resultado])
-            return unop
-
-
-        if tokenizer.next.type == 'OPERATOR' and tokenizer.next.value == '!':
-            tokenizer.selectNext()
-            resultado = Parse.parseFactor(tokenizer)
-            unop = UnOp("!", [resultado])
-            return unop
-        
         
         if tokenizer.next.type == 'OPERATOR' and tokenizer.next.value == '(':
             tokenizer.selectNext()
@@ -738,7 +709,7 @@ class Parse:
                 
                 return Assignment(name, children)
             
-            elif tokenizer.next.type == 'OPERATOR' and tokenizer.next.value == '::':
+            elif tokenizer.next.type == 'OPERATOR' and tokenizer.next.value == '>>':
                 
                 tokenizer.selectNext()
                 
@@ -951,7 +922,7 @@ class Parse:
                             name_var = tokenizer.next.value
                             tokenizer.selectNext()
                             
-                            if tokenizer.next.value == "::" and tokenizer.next.type == "OPERATOR":
+                            if tokenizer.next.value == "=>" and tokenizer.next.type == "OPERATOR":
                                 tokenizer.selectNext()
                                 
                                 if tokenizer.next.type == "TYPE" and tokenizer.next.value == "Int":
@@ -979,141 +950,132 @@ class Parse:
                                     sys.exit(1)
                     
                     
-                    #precisa de um select next
-                    #tokenizer.selectNext()
-                    
                     if tokenizer.next.type == "OPERATOR" and tokenizer.next.value == ")":
                         tokenizer.selectNext()
                         
-                        if tokenizer.next.type == "OPERATOR" and tokenizer.next.value == "::":
+                            
+                        if tokenizer.next.type == "TYPE" and tokenizer.next.value == "Int":
+                            
+                            functype = tokenizer.next.value
                             tokenizer.selectNext()
                             
-                            if tokenizer.next.type == "TYPE" and tokenizer.next.value == "Int":
-                                
-                                functype = tokenizer.next.value
+                            if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
                                 tokenizer.selectNext()
-                                
-                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+            
+                                while_children = []
+            
+                                while tokenizer.next.type != 'END':
+                                    while_children.append(Parse.ParseStatement(tokenizer))
                                     tokenizer.selectNext()
-                
-                                    while_children = []
-                
-                                    while tokenizer.next.type != 'END':
-                                        while_children.append(Parse.ParseStatement(tokenizer))
-                                        tokenizer.selectNext()
-                                    
-                                    #precisa consumir o END 
-                                    tokenizer.selectNext()
-                                    block_while = Block(while_children)
-                                    
-                                    return FuncDec(functype, [name, filhos, block_while])
                                 
-                                else:
-                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
-                                    sys.exit(1)
-                            
-                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "String":
-                                
-                                functype = tokenizer.next.value
+                                #precisa consumir o END 
                                 tokenizer.selectNext()
+                                block_while = Block(while_children)
                                 
-                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
-                                    tokenizer.selectNext()
-                
-                                    while_children = []
-                
-                                    while tokenizer.next.type != 'END':
-                                        while_children.append(Parse.ParseStatement(tokenizer))
-                                        tokenizer.selectNext()
-                                    
-                                    #precisa consumir o END 
-                                    tokenizer.selectNext()
-                                    block_while = Block(while_children)
-                                    
-                                    return FuncDec(functype, [name, filhos, block_while])
-                                
-                                else:
-                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
-                                    sys.exit(1)
-                                    
-                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "HP":
-                                
-                                functype = tokenizer.next.value
-                                tokenizer.selectNext()
-                                
-                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
-                                    tokenizer.selectNext()
-                
-                                    while_children = []
-                
-                                    while tokenizer.next.type != 'END':
-                                        while_children.append(Parse.ParseStatement(tokenizer))
-                                        tokenizer.selectNext()
-                                    
-                                    #precisa consumir o END 
-                                    tokenizer.selectNext()
-                                    block_while = Block(while_children)
-                                    
-                                    return FuncDec(functype, [name, filhos, block_while])
-                                
-                                else:
-                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
-                                    sys.exit(1)
-                            
-                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ATAQUE":
-                                
-                                functype = tokenizer.next.value
-                                tokenizer.selectNext()
-                                
-                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
-                                    tokenizer.selectNext()
-                
-                                    while_children = []
-                
-                                    while tokenizer.next.type != 'END':
-                                        while_children.append(Parse.ParseStatement(tokenizer))
-                                        tokenizer.selectNext()
-                                    
-                                    #precisa consumir o END 
-                                    tokenizer.selectNext()
-                                    block_while = Block(while_children)
-                                    
-                                    return FuncDec(functype, [name, filhos, block_while])
-                                
-                                else:
-                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
-                                    sys.exit(1)
-                                    
-                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ITEM":
-                                
-                                functype = tokenizer.next.value
-                                tokenizer.selectNext()
-                                
-                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
-                                    tokenizer.selectNext()
-                
-                                    while_children = []
-                
-                                    while tokenizer.next.type != 'END':
-                                        while_children.append(Parse.ParseStatement(tokenizer))
-                                        tokenizer.selectNext()
-                                    
-                                    #precisa consumir o END 
-                                    tokenizer.selectNext()
-                                    block_while = Block(while_children)
-                                    
-                                    return FuncDec(functype, [name, filhos, block_while])
-                                
-                                else:
-                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
-                                    sys.exit(1)
+                                return FuncDec(functype, [name, filhos, block_while])
                             
                             else:
-                                sys.stderr.write('ERROR: TYPE NOT FOUND')
+                                sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
                                 sys.exit(1)
-
+                        
+                        elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "String":
+                            
+                            functype = tokenizer.next.value
+                            tokenizer.selectNext()
+                            
+                            if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                tokenizer.selectNext()
+            
+                                while_children = []
+            
+                                while tokenizer.next.type != 'END':
+                                    while_children.append(Parse.ParseStatement(tokenizer))
+                                    tokenizer.selectNext()
+                                
+                                #precisa consumir o END 
+                                tokenizer.selectNext()
+                                block_while = Block(while_children)
+                                
+                                return FuncDec(functype, [name, filhos, block_while])
+                            
+                            else:
+                                sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                sys.exit(1)
+                                
+                        elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "HP":
+                            
+                            functype = tokenizer.next.value
+                            tokenizer.selectNext()
+                            
+                            if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                tokenizer.selectNext()
+            
+                                while_children = []
+            
+                                while tokenizer.next.type != 'END':
+                                    while_children.append(Parse.ParseStatement(tokenizer))
+                                    tokenizer.selectNext()
+                                
+                                #precisa consumir o END 
+                                tokenizer.selectNext()
+                                block_while = Block(while_children)
+                                
+                                return FuncDec(functype, [name, filhos, block_while])
+                            
+                            else:
+                                sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                sys.exit(1)
+                        
+                        elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ATAQUE":
+                            
+                            functype = tokenizer.next.value
+                            tokenizer.selectNext()
+                            
+                            if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                tokenizer.selectNext()
+            
+                                while_children = []
+            
+                                while tokenizer.next.type != 'END':
+                                    while_children.append(Parse.ParseStatement(tokenizer))
+                                    tokenizer.selectNext()
+                                
+                                #precisa consumir o END 
+                                tokenizer.selectNext()
+                                block_while = Block(while_children)
+                                
+                                return FuncDec(functype, [name, filhos, block_while])
+                            
+                            else:
+                                sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                sys.exit(1)
+                                
+                        elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ITEM":
+                            
+                            functype = tokenizer.next.value
+                            tokenizer.selectNext()
+                            
+                            if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                tokenizer.selectNext()
+            
+                                while_children = []
+            
+                                while tokenizer.next.type != 'END':
+                                    while_children.append(Parse.ParseStatement(tokenizer))
+                                    tokenizer.selectNext()
+                                
+                                #precisa consumir o END 
+                                tokenizer.selectNext()
+                                block_while = Block(while_children)
+                                
+                                return FuncDec(functype, [name, filhos, block_while])
+                            
+                            else:
+                                sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                sys.exit(1)
+                        
                         else:
-                            sys.stderr.write('ERROR: :: NOT FOUND')
+                            sys.stderr.write('ERROR: TYPE NOT FOUND')
                             sys.exit(1)
                            
                     else: 
@@ -1153,7 +1115,7 @@ def read_file(file):
     with open(file, 'r') as f:
         return f.read()
 
-string = 'test_case_5.jl'
+string = 'test_case_4.jl'
 #string = sys.argv[1]
 test_files = read_file(string)
 sb = SymbolTable()
