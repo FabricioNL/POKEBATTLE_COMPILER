@@ -34,24 +34,23 @@ class BinOp(Node):
         esquerda = self.children[1].evaluate(symboltable)
         
         if self.value == "+":
-            if direita[0] == "Int" and esquerda[0] == "Int":
-                
+            if direita[0] == "ITEM" and esquerda[0] == "HP":
                 item = self.children[0].value
                 receiver = self.children[1].value.split("_")[0]
                 print("trainer utilizou " + item)
                 print(receiver + " recuperou " + str(direita[1]) + " de HP")
-                return ["Int", direita[1] + esquerda[1]]
+                return ["HP", direita[1] + esquerda[1]]
         
         if self.value == "-":
-            if direita[0] == "Int" and esquerda[0] == "Int":
+            if direita[0] == "ATAQUE" and esquerda[0] == "HP":
                 #printa que o receiver perdeu x de vida
                 attacker = self.children[0].value.split("_")[0]
                 receiver = self.children[1].value.split("_")[0]
                 print(attacker + " atacou " + receiver)
                 print(receiver + " perdeu " + str(direita[1]) + " de HP")        
                 if (esquerda[1] - direita[1]) < 0:
-                    return ["Int", 0]
-                return ["Int", esquerda[1] - direita[1]]
+                    return ["HP", 0]
+                return ["HP", esquerda[1] - direita[1]]
         
         if self.value == "*":
             if direita[0] == "Int" and esquerda[0] == "Int":
@@ -111,6 +110,30 @@ class StringVal(Node):
     def evaluate(self, symboltable):
         return ["String", str(self.value)]
 
+class HPVal(Node):
+    
+    def __init__(self, value):
+        self.value = value
+    
+    def evaluate(self, symboltable):
+        return ["HP", int(self.value)]
+
+class AtaqueVal(Node):
+    
+    def __init__(self, value):
+        self.value = value
+    
+    def evaluate(self, symboltable):
+        return ["ATAQUE", int(self.value)]
+    
+class ItemVal(Node):
+    
+    def __init__(self, value):
+        self.value = value
+    
+    def evaluate(self, symboltable):
+        return ["ITEM", int(self.value)]
+    
 class NoOp(Node):
     
     def __init__(self):
@@ -164,7 +187,6 @@ class FuncTable:
         
 class SymbolTable:
      
-    
     def __init__(self):
         self.table = {}
                 
@@ -222,12 +244,28 @@ class VarDec(Node):
         if len(self.children) == 1:
             if self.value == "Int":
                 symboltable.create(self.children[0], [self.value, 0])  
+            elif self.value == "HP":
+                symboltable.create(self.children[0], [self.value, 0])
+            elif self.value == "ATAQUE":
+                symboltable.create(self.children[0], [self.value, 0])
+            elif self.value == "ITEM":
+                symboltable.create(self.children[0], [self.value, 0])
             elif self.value == "String":
                 symboltable.create(self.children[0], [self.value, ""]) 
         elif len(self.children) == 2:
+            #value = self.children[1].evaluate(symboltable)[0]
             if self.value == "Int" and self.children[1].evaluate(symboltable)[0] == "Int":
                 value = self.children[1].evaluate(symboltable)[1]
-                symboltable.create(self.children[0], [self.value, value])           
+                symboltable.create(self.children[0], [self.value, value])   
+            if self.value == "HP" and self.children[1].evaluate(symboltable)[0] == "Int":
+                value = self.children[1].evaluate(symboltable)[1]
+                symboltable.create(self.children[0], [self.value, value]) 
+            if self.value == "ATAQUE" and self.children[1].evaluate(symboltable)[0] == "Int":
+                value = self.children[1].evaluate(symboltable)[1]
+                symboltable.create(self.children[0], [self.value, value]) 
+            if self.value == "ITEM" and self.children[1].evaluate(symboltable)[0] == "Int":
+                value = self.children[1].evaluate(symboltable)[1]
+                symboltable.create(self.children[0], [self.value, value])         
             if self.value == "String" and self.children[1].evaluate(symboltable)[0] == "String":
                 symboltable.create(self.children[0], [self.value, self.children[1].evaluate(symboltable)[1]])
                 
@@ -466,15 +504,15 @@ class Tokenizer:
                 return 
             
             elif value == "HP":
-                self.next = Token("TYPE", "Int")
+                self.next = Token("TYPE", "HP")
                 return 
             
             elif value == "ATAQUE":
-                self.next = Token("TYPE", "Int")
+                self.next = Token("TYPE", "ATAQUE")
                 return 
         
             elif value == "ITEM":
-                self.next = Token("TYPE", "Int")
+                self.next = Token("TYPE", "ITEM")
                 return 
             
             elif value == "TIPO":
@@ -721,6 +759,61 @@ class Parse:
                         children = [name, Parse.ParseRelExpression(tokenizer)]
                         
                         return VarDec("Int", children)
+                
+                if tokenizer.next.type == "TYPE" and tokenizer.next.value == "HP":
+                    
+                    tokenizer.selectNext()
+                    
+                    if tokenizer.next.type == "QUEBRA_LINHA" and tokenizer.next.value == '\n':
+                        #tokenizer.selectNext()
+                        
+                        children = [name]
+                        
+                        return VarDec("HP", children)
+                    
+                    elif tokenizer.next.type == "OPERATOR" and tokenizer.next.value == "=":
+                        tokenizer.selectNext()
+                        
+                        children = [name, Parse.ParseRelExpression(tokenizer)]
+                        
+                        return VarDec("HP", children)
+                
+                if tokenizer.next.type == "TYPE" and tokenizer.next.value == "ATAQUE":
+                    
+                    tokenizer.selectNext()
+                    
+                    if tokenizer.next.type == "QUEBRA_LINHA" and tokenizer.next.value == '\n':
+                        #tokenizer.selectNext()
+                        
+                        children = [name]
+                        
+                        return VarDec("ATAQUE", children)
+                    
+                    elif tokenizer.next.type == "OPERATOR" and tokenizer.next.value == "=":
+                        tokenizer.selectNext()
+                        
+                        children = [name, Parse.ParseRelExpression(tokenizer)]
+                        
+                        return VarDec("ATAQUE", children)
+                    
+                
+                if tokenizer.next.type == "TYPE" and tokenizer.next.value == "ITEM":
+                    
+                    tokenizer.selectNext()
+                    
+                    if tokenizer.next.type == "QUEBRA_LINHA" and tokenizer.next.value == '\n':
+                        #tokenizer.selectNext()
+                        
+                        children = [name]
+                        
+                        return VarDec("ITEM", children)
+                    
+                    elif tokenizer.next.type == "OPERATOR" and tokenizer.next.value == "=":
+                        tokenizer.selectNext()
+                        
+                        children = [name, Parse.ParseRelExpression(tokenizer)]
+                        
+                        return VarDec("ITEM", children)
                     
                     
                 if tokenizer.next.type == "TYPE" and tokenizer.next.value == "String":
@@ -869,6 +962,18 @@ class Parse:
                                     filhos.append(VarDec("String", [name_var]))
                                     tokenizer.selectNext()
                                 
+                                elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ATAQUE":
+                                    filhos.append(VarDec("ATAQUE", [name_var]))
+                                    tokenizer.selectNext()
+                                
+                                elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "HP":
+                                    filhos.append(VarDec("HP", [name_var]))
+                                    tokenizer.selectNext()
+                                
+                                elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ITEM":
+                                    filhos.append(VarDec("ITEM", [name_var]))
+                                    tokenizer.selectNext()
+                                
                                 else:
                                     sys.stderr.write('ERROR: TYPE NOT FOUND')
                                     sys.exit(1)
@@ -908,6 +1013,78 @@ class Parse:
                                     sys.exit(1)
                             
                             elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "String":
+                                
+                                functype = tokenizer.next.value
+                                tokenizer.selectNext()
+                                
+                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                    tokenizer.selectNext()
+                
+                                    while_children = []
+                
+                                    while tokenizer.next.type != 'END':
+                                        while_children.append(Parse.ParseStatement(tokenizer))
+                                        tokenizer.selectNext()
+                                    
+                                    #precisa consumir o END 
+                                    tokenizer.selectNext()
+                                    block_while = Block(while_children)
+                                    
+                                    return FuncDec(functype, [name, filhos, block_while])
+                                
+                                else:
+                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                    sys.exit(1)
+                                    
+                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "HP":
+                                
+                                functype = tokenizer.next.value
+                                tokenizer.selectNext()
+                                
+                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                    tokenizer.selectNext()
+                
+                                    while_children = []
+                
+                                    while tokenizer.next.type != 'END':
+                                        while_children.append(Parse.ParseStatement(tokenizer))
+                                        tokenizer.selectNext()
+                                    
+                                    #precisa consumir o END 
+                                    tokenizer.selectNext()
+                                    block_while = Block(while_children)
+                                    
+                                    return FuncDec(functype, [name, filhos, block_while])
+                                
+                                else:
+                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                    sys.exit(1)
+                            
+                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ATAQUE":
+                                
+                                functype = tokenizer.next.value
+                                tokenizer.selectNext()
+                                
+                                if tokenizer.next.value == '\n' and tokenizer.next.type == "QUEBRA_LINHA":
+                                    tokenizer.selectNext()
+                
+                                    while_children = []
+                
+                                    while tokenizer.next.type != 'END':
+                                        while_children.append(Parse.ParseStatement(tokenizer))
+                                        tokenizer.selectNext()
+                                    
+                                    #precisa consumir o END 
+                                    tokenizer.selectNext()
+                                    block_while = Block(while_children)
+                                    
+                                    return FuncDec(functype, [name, filhos, block_while])
+                                
+                                else:
+                                    sys.stderr.write('ERROR: \\n NOT FOUND (FUNCTION)')
+                                    sys.exit(1)
+                                    
+                            elif tokenizer.next.type == "TYPE" and tokenizer.next.value == "ITEM":
                                 
                                 functype = tokenizer.next.value
                                 tokenizer.selectNext()
@@ -976,7 +1153,7 @@ def read_file(file):
     with open(file, 'r') as f:
         return f.read()
 
-string = 'test_case_2.jl'
+string = 'test_case_5.jl'
 #string = sys.argv[1]
 test_files = read_file(string)
 sb = SymbolTable()

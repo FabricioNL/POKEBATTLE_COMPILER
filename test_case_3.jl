@@ -11,6 +11,5 @@ super_potion::ITEM IGUAL 30
 
 mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
 pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
-
 pikachu_hp IGUAL max_potion RECUPERAR pikachu_hp
 

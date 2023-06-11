@@ -11,8 +11,6 @@ super_potion::ITEM IGUAL 30
 
 mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
 pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
-println(mimikyu_hp)
-println(pikachu_hp)
 
 ESTRATEGIA estrategia_base(pokemon_hp::HP, item_name::ITEM)::HP
     SE pokemon_hp MENOR 80
@@ -23,4 +21,3 @@ ESTRATEGIA estrategia_base(pokemon_hp::HP, item_name::ITEM)::HP
 FIM_TATICA
 
 pikachu_hp IGUAL estrategia_base(pikachu_hp, max_potion)
-println(pikachu_hp)
