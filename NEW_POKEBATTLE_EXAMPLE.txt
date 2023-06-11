@@ -1,0 +1,35 @@
+HP pikachu_hp IGUAL 120
+ATAQUE pikachu_attack IGUAL 80
+TIPO pikachu_type IGUAL ELETRIC
+
+HP mimikyu_hp IGUAL 90
+ATAQUE mimikyu_attack IGUAL 130
+TIPO mimikyu_type IGUAL "GHOST"
+
+ITEM max_potion IGUAL 20
+
+ESTRATEGIA estrategia_base (HP pokemon_hp, ITEM item_name):
+    SE pokemon_hp MENOR 20:
+        item_name RECUPERAR pokemon_hp 
+    FIM_ESTRATEGIA
+
+    RESULTADO pokemon_hp
+FIM_ESTRATEGIA
+
+ESTRATEGIA WoodHammer (ATAQUE pokemon_attack, TIPO tipo_oponente):    
+    SE tipo_oponente EXATO "GHOST":
+        pokemon_attack = 3*pokemon_attack
+
+    RESULTADO pokemon_attack
+FIM_ESTRATEGIA
+
+ENQUANTO pikachu_hp MAIOR 0:
+
+    pikachu_hp = estrategia_base[pikachu_hp,max_potion]
+    pikachu_attack = WoodHammer[pikachu_attack, mimikyu_type]
+    
+    pikachu_attack ATACAR mimikyu_hp
+    mimikyu_attack ATACAR pikachu_hp
+
+
+
