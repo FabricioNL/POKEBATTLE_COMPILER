@@ -42,10 +42,10 @@ def program(p):
 @pg.production('statement : tipo_declaration')
 @pg.production('statement : bin_op')
 @pg.production('statement : assign')
-#@pg.production('statement : while_block')
+@pg.production('statement : while_block')
 @pg.production('statement : if_block')
-#@pg.production('statement : func_declaration')
-#@pg.production('statement : funcall')
+@pg.production('statement : func_declaration')
+@pg.production('statement : funcall')
 def statement(p):
     pass
 
@@ -69,36 +69,34 @@ def bool_op(p):
 def assign(p):
     print("assign:", p)
 
-#@pg.production("while_block : WHILE bool_op QUEBRA program END")
-#def while_block(p):
-#    print("while_block:", p)
+@pg.production("while_block : WHILE bool_op QUEBRA program END")
+def while_block(p):
+    print("while_block:", p)
 
 @pg.production("if_block : IF bool_op QUEBRA program END")
 def if_block(p):
     print("if_block:", p)
 
-#@pg.production("func_declaration : FUNC_DEC VAR_NAME OPEN_PAREN func_params CLOSE_PAREN func_return_block END")
-#def func_declaration(p):
-#    print("func declaration:", p)
-#
-#@pg.production("func_params : VAR_NAME SEMI_ARROW VAR_NAME func_params")
-#@pg.production("func_params : VAR_NAME SEMI_ARROW VAR_NAME")
-#def func_params(p):
-#    pass
-#
-#@pg.production("func_return_block : program RETURN VAR_NAME")
-#def func_return_block(p):
-#    print("func return block:", p)
+@pg.production("func_declaration : FUNC_DEC VAR_NAME OPEN_PAREN func_params CLOSE_PAREN func_return_block END")
+def func_declaration(p):
+    print("func declaration:", p)
 
-#@pg.production("funcall : VAR_NAME ASSIGN VAR_NAME OPEN_PAREN funcall_params CLOSE_PAREN")
-#def funcall(p):
-#    print("funcall:", p)
+@pg.production("func_params : VAR_NAME SEMI_ARROW VAR_NAME func_params")
+@pg.production("func_params : VAR_NAME SEMI_ARROW VAR_NAME")
+def func_params(p):
+    pass
 
-#@pg.production("funcall_params : VAR_NAME VIRGULA VAR_NAME funcall_params")
-#@pg.production("funcall_params : VAR_NAME")
-#@pg.production("funcall_params :")
-#def funcall_params(p):
-#    pass
+@pg.production("func_return_block : program RETURN VAR_NAME")
+def func_return_block(p):
+    print("func return block:", p)
+@pg.production("funcall : VAR_NAME ASSIGN VAR_NAME OPEN_PAREN funcall_params CLOSE_PAREN")
+def funcall(p):
+    print("funcall:", p)
+@pg.production("funcall_params : VAR_NAME VIRGULA VAR_NAME funcall_params")
+@pg.production("funcall_params : VAR_NAME")
+@pg.production("funcall_params :")
+def funcall_params(p):
+    pass
 
 
 parser = pg.build()
