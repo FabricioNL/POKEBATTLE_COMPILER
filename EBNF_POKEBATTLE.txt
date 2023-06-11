@@ -1,32 +1,35 @@
-LETTER = ("a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" |
-            "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" |
-             "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J' | "K" | "L" | "M" | "N" | "O" | "P" 
-             | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" )
+program = { statement } ;
 
-DIGIT = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 )
+statement = atributes_declaration
+          | tipo_declaration
+          | bin_op
+          | assign
+          | while_block
+          | if_block
+          | func_declaration
+          | funcall ;
 
-STRING = LETTER {LETTER}
-NUMBER = DIGIT {DIGIT}
+atributes_declaration = VAR_NAME DOUBLE_ARROW ATRIBUTE_INT ASSIGN NUMBER ;
 
+tipo_declaration = VAR_NAME DOUBLE_ARROW ATRIBUTE_STR ASSIGN ASPAS STRING ASPAS ;
 
+bin_op = VAR_NAME BINOP VAR_NAME ;
 
-VALUE = STRING | NUMBER 
-IDENTIFIER = (LETTER)
+bool_op = VAR_NAME BOOL_OP NUMBER ;
 
-BOOL_OPERATIONS = (EXATO|MAIOR|MENOR)
-ATRIBUTE = (HP|ATAQUE|ITEM)
+assign = VAR_NAME ASSIGN bin_op ;
 
+while_block = WHILE bool_op QUEBRA program END ;
 
+if_block = IF bool_op QUEBRA program END ;
 
+func_declaration = FUNC_DEC VAR_NAME OPEN_PAREN func_params CLOSE_PAREN func_return_block END ;
 
+func_params = VAR_NAME SEMI_ARROW VAR_NAME { VIRGULA VAR_NAME SEMI_ARROW VAR_NAME } ;
 
-ASSIGNMENT = ATRIBUTE, STRING, "TEM", NUMBER | STRING, "."
-TEAM_DECLARATION = STRING, "TEM", {",", POKEMON,  POKEMON_OPTIONS}, "."
-IF_DECLARATION = "SE", BOOLEAN_EXPRESSION , THEN_EXPRESSION, "."
-THEN_EXPRESSION = (ESCOLHER, POKEMON) | (USAR, ITENS, IDENTIFIER) | (CAUSAR, NUMBER, "x", IDENTIFIER)
-BOOLEAN_EXPRESSION = (ATRIBUTE, "OPONENTE", BOOL_OPERATIONS, TIPO) | (IDENTIFIER, BOOL_OPERATIONS, NUMBER)
-FUNCTION_DECLARATION = ("GOLPE" | "ESTRATEGIA"), STRING, ":", IF_DECLARATION
-LOOP_DECLARATION = "ENQUANTO BATALHA", ":", ["ESTRATEGIA", FUNCTION_NAME, "."]
+func_return_block = program RETURN VAR_NAME ;
 
+funcall = VAR_NAME ASSIGN VAR_NAME OPEN_PAREN funcall_params CLOSE_PAREN ;
 
+funcall_params = VAR_NAME { VIRGULA VAR_NAME } ;
 
