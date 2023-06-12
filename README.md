@@ -4,6 +4,8 @@ O objetivo desse projeto é implementar uma linguagem de programação capaz de 
 
 
 ## EBNF da linguagem
+
+
 ```
 program = { statement } ;
 
@@ -43,6 +45,9 @@ funcall_params = VAR_NAME { "," VAR_NAME } ;
 ```
 
 ## Exemplo de código
+A linguagem desenvolvida permite o desenvolvimento de LOOPs, operações binárias, condicionais, operações aritméticas, declarações de função e de variáveis. Todas as operações de batalha, como RECUPERAR HP ou Atacar outro pokemon funcionam como operações aritméticas em outras linguagens.
+
+O arquivo abaixo representa o test_case_5.jl, presente no repositório. Também há outros testes no repositório para verificar o funcionamento individual das partes da linguagem.
 
 ```
 pikachu_hp>>HP IGUAL 80
@@ -73,4 +78,29 @@ BATALHA mimikyu_hp MAIOR 0
     pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
 FIM_TATICA
   
+```
+
+Saída esperada:
+
+```
+pikachu atacou mimikyu
+mimikyu perdeu 18 de HP
+mimikyu atacou pikachu
+pikachu perdeu 30 de HP
+pokebattle iniciada!
+pikachu atacou mimikyu
+mimikyu perdeu 18 de HP
+mimikyu atacou pikachu
+pikachu perdeu 30 de HP
+trainer utilizou item_name
+pokemon recuperou 50 de HP
+pikachu atacou mimikyu
+mimikyu perdeu 18 de HP
+mimikyu atacou pikachu
+pikachu perdeu 30 de HP
+pikachu atacou mimikyu
+mimikyu perdeu 18 de HP
+mimikyu atacou pikachu
+pikachu perdeu 30 de HP
+mimikyu desmaiou!
 ```
