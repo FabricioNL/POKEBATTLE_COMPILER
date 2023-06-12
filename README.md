@@ -23,30 +23,52 @@ statement = atributes_declaration
           | func_declaration
           | funcall ;
 
-atributes_declaration = VAR_NAME ">>" ATRIBUTE_INT "IGUAL" NUMBER ;
+atributes_declaration = VAR_NAME DOUBLE_ARROW ATRIBUTE_INT ASSIGN NUMBER ;
 
-tipo_declaration = VAR_NAME ">>" ATRIBUTE_STR "IGUAL" ASPAS STRING ASPAS ;
+tipo_declaration = VAR_NAME DOUBLE_ARROW ATRIBUTE_STR ASSIGN ASPAS STRING ASPAS ;
 
 bin_op = VAR_NAME BINOP VAR_NAME ;
 
 bool_op = VAR_NAME BOOL_OP NUMBER ;
 
-assign = VAR_NAME "IGUAL" bin_op ;
+assign = VAR_NAME ASSIGN bin_op ;
 
-while_block = "BATALHA" bool_op QUEBRA program "FIM_TATICA" ;
+while_block = WHILE bool_op QUEBRA program END ;
 
-if_block = "SE" bool_op QUEBRA program "FIM_TATICA" ;
+if_block = IF bool_op QUEBRA program END ;
 
-func_declaration = "ESTRATEGIA" VAR_NAME "(" func_params ")" func_return_block "FIM_TATICA" ;
+func_declaration = FUNC_DEC VAR_NAME OPEN_PAREN func_params CLOSE_PAREN func_return_block END ;
 
-func_params = VAR_NAME "=>" VAR_NAME { "," VAR_NAME "=>" VAR_NAME } ;
+func_params = VAR_NAME SEMI_ARROW VAR_NAME { VIRGULA VAR_NAME SEMI_ARROW VAR_NAME } ;
 
-func_return_block = program "RESULTADO" VAR_NAME ;
+func_return_block = program RETURN VAR_NAME ;
 
-funcall = VAR_NAME "IGUAL" VAR_NAME "(" funcall_params ")" ;
+funcall = VAR_NAME ASSIGN VAR_NAME OPEN_PAREN funcall_params CLOSE_PAREN ;
 
-funcall_params = VAR_NAME { "," VAR_NAME } ;
+funcall_params = VAR_NAME { VIRGULA VAR_NAME } ;
 
+VIRGULA ::= , ;
+VARNAME ::= [a-zA-Z]+_[a-zA-Z]+ ;
+ASSIGN  ::= IGUAL ;
+ATRIBUTE_INT ::= HP|ATAQUE ;
+BOOL_OP ::= MAIOR|MENOR|EXATO ;
+IF ::= SE ;
+NUMBER ::= \d+ ;
+NUMBER ::= digit { digit } ;
+digit ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 ;
+ATRIBUTE_STR ::= TIPO ; 
+QUEBRA ::= \n ;
+BINOP ::= RECUPERAR|ATACAR|* ;
+END ::= FIM_TATICA ;
+WHILE ::= BATALHA ;
+RETURN ::= RESULTADO ; 
+ASPAS ::= " ;
+OPEN_PAREN ::= ( ;
+CLOSE_PAREN ::= ) ;
+DOUBLE_ARROW ::= >> ;
+SEMI_ARROW ::= => ;
+FUNC_DEC ::= ESTRATEGIA ;
+STRING ::= [A-Z]+;
 ```
 
 ## Exemplo de código
