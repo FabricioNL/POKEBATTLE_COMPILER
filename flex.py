@@ -21,7 +21,8 @@ lg.add("CLOSE_PAREN", r'\)')
 lg.add("DOUBLE_ARROW", r'>>')
 lg.add("SEMI_ARROW", r'=>')
 lg.add("FUNC_DEC", r'(ESTRATEGIA)')
-lg.add('VAR_NAME', r'[a-zA-Z_]+')
+lg.add('STRING', r'[A-Z]+')
+lg.add('VAR_NAME', r'[a-zA-Z]+_[a-zA-Z]+')
 
 lexer = lg.build()
 

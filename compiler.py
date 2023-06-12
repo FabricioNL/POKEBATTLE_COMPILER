@@ -53,8 +53,10 @@ class BinOp(Node):
                 return ["HP", esquerda[1] - direita[1]]
         
         if self.value == "*":
-            if direita[0] == "Int" and esquerda[0] == "Int":
-                return ["Int", direita[1] * esquerda[1]]
+            if direita[0] == "ATAQUE" and esquerda[0] == "Int":
+                attacker = self.children[0].value.split("_")[0]
+                print(attacker + " obteve BOOST de " + str(esquerda[1]) + " vezes")
+                return ["ATAQUE", direita[1] * esquerda[1]]
         if self.value == "==":
             if direita[1] == esquerda[1]:
                 return ["Int", 1]
@@ -1115,7 +1117,7 @@ def read_file(file):
     with open(file, 'r') as f:
         return f.read()
 
-string = 'test_case_4.jl'
+string = 'test_case_6.jl'
 #string = sys.argv[1]
 test_files = read_file(string)
 sb = SymbolTable()

@@ -9,8 +9,9 @@ mimikyu_tipo>>TIPO IGUAL "FANTASMA"
 max_potion>>ITEM IGUAL 50
 super_potion>>ITEM IGUAL 30
 
-mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
-pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
+SE mimikyu_tipo EXATO "FANTASMA"
+    pikachu_attack IGUAL pikachu_attack*2
+FIM_TATICA
 
 ESTRATEGIA estrategia_base(pokemon_hp=>HP, item_name=>ITEM) HP
     SE pokemon_hp MENOR 30
