@@ -2,6 +2,9 @@
 
 O objetivo desse projeto é implementar uma linguagem de programação capaz de simular batalhas pokemons. Assim como simuladores famosos como pokemon showdown [https://play.pokemonshowdown.com/], um dos principais objetivos é tornar possível o treino para batalhas competitivas sem a necessidade de outros jogares, apenas simulando estratégias.
 
+## Como utilizar
+
+Para utilizar a linguagem, é importante utilizar o compiler.py presente no repositório. Assim, basta criar um arquivo com o código escrito em POKEBATTLE seguindo a EBNF da linguagem e rodar o script do compilador passando o caminho do arquivo de texto como entrada.
 
 ## EBNF da linguagem
 
