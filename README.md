@@ -1,113 +1,76 @@
 # POKEBATTLE_COMPILER
 
-O repositório tem por objetivo criar um compilador para uma linguagem de programação baseada em batalhas pokemon. Nela você consegue definir equipes, regras e estratégias para simular uma batalha.
+O objetivo desse projeto é implementar uma linguagem de programação capaz de simular batalhas pokemons. Assim como simuladores famosos como pokemon showdown [https://play.pokemonshowdown.com/], um dos principais objetivos é tornar possível o treino para batalhas competitivas sem a necessidade de outros jogares, apenas simulando estratégias.
+
 
 ## EBNF da linguagem
 ```
-LETTER = ("a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" |
-            "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" |
-             "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J' | "K" | "L" | "M" | "N" | "O" | "P" 
-             | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" )
+program = { statement } ;
 
-DIGIT = ( 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 )
+statement = atributes_declaration
+          | tipo_declaration
+          | bin_op
+          | assign
+          | while_block
+          | if_block
+          | func_declaration
+          | funcall ;
 
-TIPO = ( NORMAL | FOGO | AGUA | ELETRICO | GRAMA | GELO | LUTADOR | VENENO | 
-        TERRA | VOADOR | PSIQUICO | INSETO | PEDRA | FANTASMA | DRAGAO | AÇO | 
-        FADA | SOMBRIO )
+atributes_declaration = VAR_NAME ">>" ATRIBUTE_INT "IGUAL" NUMBER ;
 
-POKEMON_OPTIONS = ("Dragonite" | "Eevee" | "Garchomp" | "Glaceon" | "Empoleon" | "Togekiss" | 
-        "Charizard" | "Ho-oh" | "Pikachu" | "Entei" | "Suicune" | "Blastoise" | "Mimikyu" |
-        "Lucario" | "Corsola" | "Emolga" | "Serviper" | "Torterra" | "Altaria" | "Absol" | "Palkia" |
-        "Darkari", "Gallade", "Lapras", "Milotic", "Spiritomb", "Roserade")
+tipo_declaration = VAR_NAME ">>" ATRIBUTE_STR "IGUAL" ASPAS STRING ASPAS ;
 
-STRING = LETTER {LETTER}
-NUMBER = DIGIT {DIGIT}
+bin_op = VAR_NAME BINOP VAR_NAME ;
 
-VALUE = STRING | NUMBER 
-IDENTIFIER = (LETTER)
+bool_op = VAR_NAME BOOL_OP NUMBER ;
 
-BOOL_OPERATIONS = ("IGUAL" | "MAIOR" | "MENOR"| "E"| "OU")
+assign = VAR_NAME "IGUAL" bin_op ;
 
-ATRIBUTE = ("HP", "ATAQUE", "POKEMON", "ITENS", "HABILIDADE", "TIME", "OPONENTE")
+while_block = "BATALHA" bool_op QUEBRA program "FIM_TATICA" ;
 
-ASSIGNMENT = ATRIBUTE, STRING, "TEM", NUMBER | STRING, "."
+if_block = "SE" bool_op QUEBRA program "FIM_TATICA" ;
 
-TEAM_DECLARATION = STRING, "TEM", {",", POKEMON,  POKEMON_OPTIONS}, "."
+func_declaration = "ESTRATEGIA" VAR_NAME "(" func_params ")" func_return_block "FIM_TATICA" ;
 
-IF_DECLARATION = "SE", BOOLEAN_EXPRESSION , THEN_EXPRESSION, "."
+func_params = VAR_NAME "=>" VAR_NAME { "," VAR_NAME "=>" VAR_NAME } ;
 
-THEN_EXPRESSION = (ESCOLHER, POKEMON) | (USAR, ITENS, IDENTIFIER) | (CAUSAR, NUMBER, "x", IDENTIFIER)
+func_return_block = program "RESULTADO" VAR_NAME ;
 
-BOOLEAN_EXPRESSION = (ATRIBUTE, "OPONENTE", BOOL_OPERATIONS, TIPO) | (IDENTIFIER, BOOL_OPERATIONS, NUMBER)
+funcall = VAR_NAME "IGUAL" VAR_NAME "(" funcall_params ")" ;
 
-FUNCTION_DECLARATION = ("GOLPE" | "ESTRATEGIA"), STRING, ":", IF_DECLARATION
+funcall_params = VAR_NAME { "," VAR_NAME } ;
 
-LOOP_DECLARATION = "ENQUANTO BATALHA", ":", ["ESTRATEGIA", FUNCTION_NAME, "."]
-``` 
+```
 
 ## Exemplo de código
 
 ```
-#processo de definição da equipe
-TIME minha_equipe TEM POKEMON Pikachu, POKEMON Togekiss, POKEMON Gallade, POKEMON Glaceon, POKEMON Lapras, POKEMON Mimikyu.
+pikachu_hp>>HP IGUAL 80
+pikachu_attack>>ATAQUE IGUAL 18
+pikachu_tipo>>TIPO IGUAL "ELETRICO"
 
-#processo de definição dos atributos dos pokemons escolhidos
-HP pikachu_hp TEM 120.
-ATAQUE pikachu_attack TEM 80.
-HABILIDADE pikachu_special TEM ThunderBolt.
-TIPO pikachu_type TEM ELETRIC.
-. 
-. 
-. 
-HP mimikyu_hp TEM 90.
-ATAQUE mimikyu_attack TEM 130.
-HABILIDADE mimikyu_special TEM WoodHammer.
-TIPO mimikyu_type TEM GHOST.
+mimikyu_hp>>HP IGUAL 60
+mimikyu_attack>>ATAQUE IGUAL 30
+mimikyu_tipo>>TIPO IGUAL "FANTASMA"
 
-ITENS mochila: 2x potion, 3x revive, 1x max_potion.
+max_potion>>ITEM IGUAL 50
+super_potion>>ITEM IGUAL 30
 
-#precisa tambem definir a equipe dos oponentes
-OPONENTE Garchomp, Lucario, Milotic, Roserade, Spiritomb.
+mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
+pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
 
-HP garchomp_hp TEM 200.
-ATAQUE garchomp_attack TEM 180.
-HABILIDADE garchomp_special TEM DragonClaw.
-TIPO garchomp_type TEM DRAGON.
+ESTRATEGIA estrategia_base(pokemon_hp=>HP, item_name=>ITEM) HP
+    SE pokemon_hp MENOR 30
+        pokemon_hp IGUAL item_name RECUPERAR pokemon_hp 
+    FIM_TATICA
 
-.
-.
-.
+    RESULTADO pokemon_hp
+FIM_TATICA
 
-#agora devem ser iniciada as regras da batalha. Você cria as regras como se a máquina devesse 
-#seguir com base nos acontecimentos, como um manual de batalha.
-
-#definindo todos os setups de trocas do jogo. Funciona como definir funções.
-
-ESTRATEGIA BASE:
-    SE TIPO OPONENTE IGUAL DRAGAO, ESCOLHER Glaceon. 
-    SE TIPO OPONENTE IGUAL LUTADOR, ESCOLHER Togekiss.
-    SE TIPO OPONENTE IGUAL AGUA, ESCOLHER Mimikyu.
-
-    SE glaceon_hp IGUAL 0, USAR revive.
-    SE lapras_hp IGUAL 0, USAR revive.
-    SE mimikyu_hp IGUAL 0, USAR revive.
-
-    SE glaceon_hp MAIOR 0 E MENOR 50, USAR potion.
-    SE gallade_hp MAIOR 0 E MENOR 120, USAR max_potion.
-
-#voce tambem pode criar funcoes de ataque. Caso nao crie, o ataque tera o ataque base 
-
-GOLPE WoodHammer:
-    
-    SE mimikyu_hp MENOR 60, CAUSAR 10x mimikyu_attack.
-    SE TIPO OPONENTE WATER, CAUSAR 5x mimikyu_attack.
-
-#A batalha é feita por turnos. Uma vez sua e outra do oponente. No turno 0 é feito o processo
-#de escolha dos pokemons.
-   
-
-ENQUANTO BATALHA:
-    ESTRATEGIA BASE.
-    TURNO OPONENTE.
-    TURNO JOGADOR.
+BATALHA mimikyu_hp MAIOR 0
+    pikachu_hp IGUAL estrategia_base(pikachu_hp, max_potion)
+    mimikyu_hp IGUAL pikachu_attack ATACAR mimikyu_hp
+    pikachu_hp IGUAL mimikyu_attack ATACAR pikachu_hp
+FIM_TATICA
+  
 ```
