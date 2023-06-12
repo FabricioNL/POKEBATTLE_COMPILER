@@ -33,3 +33,25 @@ funcall = VAR_NAME ASSIGN VAR_NAME OPEN_PAREN funcall_params CLOSE_PAREN ;
 
 funcall_params = VAR_NAME { VIRGULA VAR_NAME } ;
 
+VIRGULA ::= , ;
+VARNAME ::= [a-zA-Z]+_[a-zA-Z]+ ;
+ASSIGN  ::= IGUAL ;
+ATRIBUTE_INT ::= HP|ATAQUE ;
+BOOL_OP ::= MAIOR|MENOR|EXATO ;
+IF ::= SE ;
+NUMBER ::= \d+ ;
+NUMBER ::= digit { digit } ;
+digit ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 ;
+ATRIBUTE_STR ::= TIPO ; 
+QUEBRA ::= \n ;
+BINOP ::= RECUPERAR|ATACAR|* ;
+END ::= FIM_TATICA ;
+WHILE ::= BATALHA ;
+RETURN ::= RESULTADO ; 
+ASPAS ::= " ;
+OPEN_PAREN ::= ( ;
+CLOSE_PAREN ::= ) ;
+DOUBLE_ARROW ::= >> ;
+SEMI_ARROW ::= => ;
+FUNC_DEC ::= ESTRATEGIA ;
+STRING ::= [A-Z]+;
