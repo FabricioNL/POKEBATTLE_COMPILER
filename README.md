@@ -1,5 +1,7 @@
 # POKEBATTLE_COMPILER
 
+![pokebattle](pokebattle.jpeg)
+
 O objetivo desse projeto é implementar uma linguagem de programação capaz de simular batalhas pokemons. Assim como simuladores famosos como pokemon showdown [https://play.pokemonshowdown.com/], um dos principais objetivos é tornar possível o treino para batalhas competitivas sem a necessidade de outros jogares, apenas simulando estratégias.
 
 Uma apresentação sobre a linguagem pode ser acessada no link a seguir: [clique aqui](https://www.canva.com/design/DAFlo3A9Dmc/4UswNXZCTWYhu-jiVRHO7A/edit?utm_content=DAFlo3A9Dmc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
@@ -131,3 +133,5 @@ mimikyu atacou pikachu
 pikachu perdeu 30 de HP
 mimikyu desmaiou!
 ```
+
+**OBS** Existem outros testes no repositório! Sinta-se à vontade para testá-los ou criar as suas próprias batalhas!
